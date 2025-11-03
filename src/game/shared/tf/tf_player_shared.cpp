@@ -7576,8 +7576,20 @@ void CTFPlayerShared::UpdateCritBoostEffect( ECritBoostUpdateType eUpdateType )
 void CTFPlayerShared::OnAddSodaPopperHype( void )
 {
 #ifdef CLIENT_DLL
+
+#if 0
+	Msg( "CTFPlayerShared::OnAddSodaPopperHype() called on tick %d\n", gpGlobals->tickcount );
+	Msg( "  - IsFirstTimePredicted(): %d\n", prediction->IsFirstTimePredicted() );
+	Msg( "  - m_bSyncingConditions:   %d\n", m_bSyncingConditions );
+	Msg( "  - InPrediction():         %d\n", prediction->InPrediction() );
+#endif
+
+	if ( m_bSyncingConditions || !prediction->IsFirstTimePredicted() )
+		return;
+
 	if ( m_pOuter->IsLocalPlayer() )
 	{
+		Msg( "[Tick %d] attempting to play DisciplineDevice.PowerUp\n", gpGlobals->tickcount );
 		m_pOuter->EmitSound( "DisciplineDevice.PowerUp" );
 	}
 #endif // CLIENT_DLL
@@ -7586,6 +7598,9 @@ void CTFPlayerShared::OnAddSodaPopperHype( void )
 void CTFPlayerShared::OnRemoveSodaPopperHype( void )
 {
 #ifdef CLIENT_DLL
+	if ( m_bSyncingConditions || !prediction->IsFirstTimePredicted() )
+		return;
+
 	if ( m_pOuter->IsLocalPlayer() )
 	{
 		m_pOuter->EmitSound( "DisciplineDevice.PowerDown" );
